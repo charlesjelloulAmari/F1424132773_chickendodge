@@ -1,0 +1,12 @@
+# IDE Specific
+*.csproj
+*.pidb
+*.sln
+*.userprefs
+*.unityproj
+*.suo
+/Assets/*.rsp
+/Assets/*.rsp.meta
+/Library/
+/Temp/
+/obj/

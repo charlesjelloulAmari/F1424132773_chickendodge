@@ -1,0 +1,87 @@
+fileFormatVersion: 2
+guid: 9644dc1424bc5014a8f8b01bc12e49b5
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: Legs
+    100002: Head
+    100004: Viking_Helm
+    100006: Hat
+    100008: Body
+    100010: //RootNode
+    400000: Legs
+    400002: Head
+    400004: Viking_Helm
+    400006: Hat
+    400008: Body
+    400010: //RootNode
+    2300000: Legs
+    2300002: Head
+    2300004: Viking_Helm
+    2300006: Hat
+    2300008: Body
+    3300000: Legs
+    3300002: Head
+    3300004: Viking_Helm
+    3300006: Hat
+    3300008: Body
+    4300000: Hat
+    4300002: Viking_Helm
+    4300004: Head
+    4300006: Body
+    4300008: Legs
+    11100000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 3
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  additionalBone: 0
+  userData: 
