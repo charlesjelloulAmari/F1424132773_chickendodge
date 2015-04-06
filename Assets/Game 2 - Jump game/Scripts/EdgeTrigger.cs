@@ -5,8 +5,8 @@ public class EdgeTrigger : MonoBehaviour {
 
     //You could implement this yourself..
 
-   void OnTriggerEnter(){
+   void OnCollisionEnter(){
        Debug.Log("OnTriggerEnter..");
+		GameControl.sparks.SetActive(true);
    }
-
 }

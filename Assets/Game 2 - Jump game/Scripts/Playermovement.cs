@@ -11,7 +11,6 @@ public class Playermovement : MonoBehaviour
         rigidbody.velocity = new Vector3(0, rigidbody.velocity.y, 0); //Set X and Z velocity to 0
  
         transform.Translate(Input.GetAxis("Horizontal") * Time.deltaTime * movementSpeed, 0, 0);
-
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             Jump(); //Manual jumping
@@ -26,7 +25,7 @@ public class Playermovement : MonoBehaviour
 		} else {
 
 			//GameObject.Find("Sparks").SetActive(true);
-
+			GameControl.sparks.SetActive(false);
 			isGrounded = false;
 			rigidbody.velocity = new Vector3 (0, 0, 0);
 			rigidbody.AddForce (new Vector3 (0, 250, 0), ForceMode.Force);

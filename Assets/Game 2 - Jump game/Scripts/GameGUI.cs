@@ -49,6 +49,7 @@ public class GameGUI : MonoBehaviour {
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
 
+
         }
     }
 
@@ -58,5 +59,6 @@ public class GameGUI : MonoBehaviour {
         {
             PlayerPrefs.SetInt("BestScorePlatforms", score);
         }
+		GameObject.Find("Sparks").SetActive(false);
     }
 }

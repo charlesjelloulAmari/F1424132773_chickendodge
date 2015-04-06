@@ -7,6 +7,7 @@ public class GameControl : MonoBehaviour {
 
     public Transform platformPrefab;
     public static GameState gameState;
+	public static GameObject sparks;
 
     private Transform playerTrans;
     private float platformsSpawnedUpTo = 0.0f;
@@ -26,6 +27,7 @@ public class GameControl : MonoBehaviour {
     {
         Time.timeScale = 1.0f;
         gameState = GameState.playing;
+		sparks = GameObject.Find ("Sparks");
     }
 
     void GameOver()
@@ -36,6 +38,7 @@ public class GameControl : MonoBehaviour {
     }
 
 	void Update () {
+
         //Do we need to spawn new platforms yet? (we do this every X meters we climb)
         float playerHeight = playerTrans.position.y;
         if (playerHeight > nextPlatformCheck)
