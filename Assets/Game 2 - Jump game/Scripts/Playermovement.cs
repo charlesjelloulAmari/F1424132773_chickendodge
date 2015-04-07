@@ -98,6 +98,13 @@ public class Playermovement : MonoBehaviour
 			rigidbody.useGravity = false;
 			//rigidbody.AddForce (new Vector3 (0, 100, 0), ForceMode.Force);
 		}
+		if (col.gameObject.name.Contains("JetGel")) {
+			form = PlayerForm.Water;
+			vapor.SetActive(false);
+			water.SetActive(true);
+			rigidbody.useGravity = true;
+			//rigidbody.AddForce (new Vector3 (0, 100, 0), ForceMode.Force);
+		}
 	}
 
 	void OnCollisionExit(Collision col){
