@@ -81,8 +81,13 @@ public class Playermovement : MonoBehaviour
 	}
 
 	void OnTriggerExit(){
-		grilleOnCollision.GetComponent<Collider>().isTrigger = false;
-		grilleOnCollision = null;
+
+		GameObject.Find ("JetGel").collider.isTrigger = false;
+		
+		if (grilleOnCollision != null) {
+			grilleOnCollision.GetComponent<Collider> ().isTrigger = false;
+			grilleOnCollision = null;
+		}
 	}
 	
 	void Jump()
@@ -146,6 +151,7 @@ public class Playermovement : MonoBehaviour
 		if (col.gameObject.name.Contains("JetGel")) {
 			passTo(PlayerForm.Ice);
 			rigidbody.useGravity = true;
+			col.gameObject.collider.isTrigger = true;
 		}
 		if (col.gameObject.name.Contains("Flaque_Poison")) {
 			passTo(PlayerForm.Poison);
