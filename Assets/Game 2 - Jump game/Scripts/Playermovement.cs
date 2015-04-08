@@ -1,18 +1,32 @@
 using UnityEngine;
 using System.Collections;
 
-public enum PlayerForm{ Water, Vapor};
+public enum PlayerForm{ Water, Vapor, Poison, Flubber, Ice};
 
 public class Playermovement : MonoBehaviour
 
 {
+
+	public int highJump = 600;
+	public int normalJump = 250;
+	public int lowJump = 120;
+
     public float movementSpeed = 5.0f;
 	private bool isGrounded = false;
-	private bool touchAWall = false;
 	PlayerForm form = PlayerForm.Water;
 
 	public GameObject water;
 	public GameObject vapor;
+	public GameObject poison;
+	public GameObject flubber;
+	public GameObject ice;
+
+	public GameObject grilleOnCollision;
+
+	
+	public PhysicMaterial bouncy;
+	public PhysicMaterial ice_mat;
+	
 
 	float distToGround;
 
@@ -21,11 +35,23 @@ public class Playermovement : MonoBehaviour
 		distToGround = collider.bounds.extents.y;
 		water = GameObject.Find("Water");
 		vapor = GameObject.Find ("Vapor");
-		//vapor = GameObject.FindGameObjectWithTag ("VaporForm");
+		poison = GameObject.Find ("Poison");
+		flubber = GameObject.Find ("Flubber");
+		ice = GameObject.Find ("Ice");
+		
+		bouncy = (PhysicMaterial)Resources.Load ("Bouncy_2");
+		ice_mat = (PhysicMaterial)Resources.Load ("Ice_2");
+
+		if (ice_mat == null)
+			Debug.Log ("ice mat null");
 
 		PlayerForm form = PlayerForm.Water;
 
 		vapor.SetActive(false);
+		poison.SetActive(false);
+		flubber.SetActive(false);
+		ice.SetActive (false);
+
 	}
 
     void Update() {
@@ -37,31 +63,59 @@ public class Playermovement : MonoBehaviour
 
         transform.Translate(Input.GetAxis("Horizontal") * Time.deltaTime * movementSpeed, 0, 0);
 
-		/*if (touchAWall) {
-			transform.Translate (0, Input.GetAxis ("Vertical") * Time.deltaTime * movementSpeed, 0);
-		}*/
+		gererInput ();
 
-        if (Input.GetButtonDown("Jump") && isGrounded)
-        {
-            Jump(); //Manual jumping
-        }
 	}
 
-    void Jump()
+	void gererInput(){
+		if (Input.GetButtonDown("Jump") )
+		{
+			Jump();
+		}
+		if (Input.GetButtonDown("Fire1") )
+		{
+			if(form == PlayerForm.Poison && grilleOnCollision != null){
+				grilleOnCollision.GetComponent<Collider>().isTrigger = true;
+			}
+		}
+	}
+
+	void OnTriggerExit(){
+		grilleOnCollision.GetComponent<Collider>().isTrigger = false;
+		grilleOnCollision = null;
+	}
+	
+	void Jump()
     {	     
+
 		switch (form) {
 		case PlayerForm.Water:
+		case PlayerForm.Poison:
+			rigidbody.useGravity = true;
 			if (isGrounded) {
 				isGrounded = false;
 				rigidbody.velocity = new Vector3 (0, 0, 0);
-				rigidbody.AddForce (new Vector3 (0, 250, 0), ForceMode.Force);
+				rigidbody.AddForce (new Vector3 (0, normalJump, 0), ForceMode.Force);
 			}  
 			break;
 		case PlayerForm.Vapor:
 			if (isGrounded) {
 				isGrounded = false;
+				passTo(PlayerForm.Water);
+			}
+			break;
+		case PlayerForm.Flubber:
+			if (isGrounded) {
+				isGrounded = false;
 				rigidbody.velocity = new Vector3 (0, 0, 0);
-				rigidbody.AddForce (new Vector3 (0, -250, 0), ForceMode.Force);
+				rigidbody.AddForce (new Vector3 (0, highJump, 0), ForceMode.Force);
+			}
+			break;
+		case PlayerForm.Ice:
+			if (isGrounded) {
+				isGrounded = false;
+				rigidbody.velocity = new Vector3 (0, 0, 0);
+				rigidbody.AddForce (new Vector3 (0, lowJump, 0), ForceMode.Force);
 			}
 			break;
 		}
@@ -70,10 +124,11 @@ public class Playermovement : MonoBehaviour
 
     void FixedUpdate()
     {
-		/*touchAWall = (Physics.Raycast(transform.position, Vector3.left, distToGround + 0.1f) 
-		              || Physics.Raycast(transform.position, Vector3.right, distToGround + 0.1f) );*/
 		switch (form) {
 		case PlayerForm.Water:
+		case PlayerForm.Poison:
+		case PlayerForm.Flubber:
+		case PlayerForm.Ice:
 			isGrounded = Physics.Raycast(transform.position, -Vector3.up, distToGround + 0.1f);
 			break;
 		case PlayerForm.Vapor:
@@ -81,36 +136,76 @@ public class Playermovement : MonoBehaviour
 			break;
 		}
         if (isGrounded){}
-
-		/*if (touchAWall) {
-			Debug.Log("Oui ici");
-			rigidbody.useGravity = false;
-		}
-			else
-			rigidbody.useGravity = true;*/
     }
 
 	void OnCollisionEnter(Collision col){
 		if (col.gameObject.name.Contains("Radiateur")) {
-			form = PlayerForm.Vapor;
-			vapor.SetActive(true);
-			water.SetActive(false);
+			passTo(PlayerForm.Vapor);
 			rigidbody.useGravity = false;
-			//rigidbody.AddForce (new Vector3 (0, 100, 0), ForceMode.Force);
 		}
 		if (col.gameObject.name.Contains("JetGel")) {
-			form = PlayerForm.Water;
-			vapor.SetActive(false);
-			water.SetActive(true);
+			passTo(PlayerForm.Ice);
 			rigidbody.useGravity = true;
-			//rigidbody.AddForce (new Vector3 (0, 100, 0), ForceMode.Force);
+		}
+		if (col.gameObject.name.Contains("Flaque_Poison")) {
+			passTo(PlayerForm.Poison);
+			rigidbody.useGravity = true;
+		}
+		if (col.gameObject.name.Contains("Flaque_Flubber")) {
+			passTo(PlayerForm.Flubber);
+			rigidbody.useGravity = true;
+		}
+
+		if (form == PlayerForm.Vapor && col.gameObject.name.Contains("EdgeTrigger") ){
+			passTo (PlayerForm.Water);
+			rigidbody.useGravity = false;
+		}
+
+		if(col.gameObject.name.Contains("Grille")){
+			grilleOnCollision = col.gameObject;
+		}
+	}
+
+	public void passTo(PlayerForm to){
+		water.SetActive(false);
+		vapor.SetActive(false);
+		flubber.SetActive(false);
+		poison.SetActive(false);
+		ice.SetActive(false);
+
+		
+		collider.material = null;
+		
+		switch (to) {
+		case PlayerForm.Water:
+			form = PlayerForm.Water;
+			water.SetActive(true);
+			break;
+		case PlayerForm.Poison:
+			form = PlayerForm.Poison;
+			poison.SetActive(true);
+			break;
+		case PlayerForm.Flubber:
+			form = PlayerForm.Flubber;
+			collider.material = bouncy;
+			flubber.SetActive(true);
+			break;
+		case PlayerForm.Vapor:
+			form = PlayerForm.Vapor;
+			vapor.SetActive(true);
+			break;
+		case PlayerForm.Ice:
+			form = PlayerForm.Ice;
+			collider.material = ice_mat;
+			ice.SetActive(true);
+			break;
 		}
 	}
 
 	void OnCollisionExit(Collision col){
-		if (form == PlayerForm.Vapor){
-			//rigidbody.AddForce (new Vector3 (0, 100, 0), ForceMode.Force);
+		if (form != PlayerForm.Vapor) {
+			rigidbody.useGravity = true;
 		}
 	}
-
+	
 }
