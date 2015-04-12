@@ -7,6 +7,8 @@ public class GameControl : MonoBehaviour {
 	
     public static GameState gameState;
 	public static float gravity = 9.8f;
+	public static float gameWidth = 34.0f;
+	public static float gameHeight = 16.0f;
 	
     private Transform playerTrans;
 
