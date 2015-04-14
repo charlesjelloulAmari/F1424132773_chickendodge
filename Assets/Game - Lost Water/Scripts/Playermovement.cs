@@ -26,6 +26,8 @@ public class Playermovement : MonoBehaviour
 	
 	public PhysicMaterial bouncy;
 	public PhysicMaterial ice_mat;
+
+	public int compteur = 0;
 	
 
 	float distToGround;
@@ -209,9 +211,13 @@ public class Playermovement : MonoBehaviour
 	}
 
 	void OnCollisionExit(Collision col){
-		if (form != PlayerForm.Vapor) {
+		if (form != PlayerForm.Vapor && !IsGroundedUp()) {
 			rigidbody.useGravity = true;
 		}
+	}
+
+	bool IsGroundedUp (){
+		return Physics.Raycast(transform.position, Vector3.up, distToGround + 1.1f);
 	}
 	
 }

@@ -7,14 +7,21 @@ public class GameControl : MonoBehaviour {
 	
     public static GameState gameState;
 	public static float gravity = 9.8f;
-	public static float gameWidth = 34.0f;
-	public static float gameHeight = 16.0f;
+	public static float levelWidth = 35.5f;
+	public static float levelHeight = 15.5f;
+
+	public static float overHeight = 10.28f - 7.75f; //position de la camera en y, - la psoition en y de la normal initiale
 	
     private Transform playerTrans;
+	private Transform cameraTrans;
+
+	public int compteur;
 
     
 	void Awake () {
         playerTrans = GameObject.FindGameObjectWithTag("Player").transform;
+		cameraTrans = GameObject.FindGameObjectWithTag("MainCamera").transform;
+
         StartGame();
 	}
 
@@ -33,6 +40,23 @@ public class GameControl : MonoBehaviour {
     }
 
 	void Update () {
+		if (playerTrans.position.x > cameraTrans.position.x + levelWidth/2){
+			Vector3 temp = new Vector3(levelWidth,0,0);
+			cameraTrans.position += temp; 
+		}
+		else if (playerTrans.position.x < cameraTrans.position.x - levelWidth/2) {
+			Vector3 temp = new Vector3(-levelWidth,0,0);
+			cameraTrans.position += temp; 
+		}
+
+		if (playerTrans.position.y > cameraTrans.position.y - overHeight + levelHeight/2){
+			Vector3 temp = new Vector3(0,levelHeight,0);
+			cameraTrans.position += temp; 
+		}
+		else if (playerTrans.position.y < cameraTrans.position.y - overHeight - levelHeight/2) {
+			Vector3 temp = new Vector3(0,-levelHeight,0);
+			cameraTrans.position += temp; 
+		}
 	}
 
 }
