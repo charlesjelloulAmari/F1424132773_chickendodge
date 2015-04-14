@@ -84,8 +84,11 @@ public class Playermovement : MonoBehaviour
 
 	void OnTriggerExit(){
 
-		GameObject.Find ("JetGel").collider.isTrigger = false;
-		
+		GameObject[] list_gel = GameObject.FindGameObjectsWithTag ("JetGel");
+		foreach(GameObject jetgel in list_gel){
+			jetgel.collider.isTrigger = false;
+		}
+
 		if (grilleOnCollision != null) {
 			grilleOnCollision.GetComponent<Collider> ().isTrigger = false;
 			grilleOnCollision = null;
