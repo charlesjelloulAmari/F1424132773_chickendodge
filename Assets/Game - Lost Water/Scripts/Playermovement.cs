@@ -175,6 +175,11 @@ public class Playermovement : MonoBehaviour
 		if(col.gameObject.name.Contains("Grille")){
 			grilleOnCollision = col.gameObject;
 		}
+
+		if(col.gameObject.name.Contains("Contact")){
+			col.gameObject.GetComponentInParent<Animator>().Play("condensation_generator");
+			col.gameObject.transform.parent.Find("Lightning").gameObject.SetActive(false);
+		}
 	}
 
 	public void passTo(PlayerForm to){
