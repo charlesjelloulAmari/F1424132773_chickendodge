@@ -14,19 +14,23 @@ public class GameControl : MonoBehaviour {
 	
     private Transform playerTrans;
 	private Transform cameraTrans;
+	private Playermovement playerscript;
 
 	public int compteur;
 
     
 	void Awake () {
-        playerTrans = GameObject.FindGameObjectWithTag("Player").transform;
+		playerTrans = GameObject.FindGameObjectWithTag("Player").transform;
 		cameraTrans = GameObject.FindGameObjectWithTag("MainCamera").transform;
+		playerscript = (Playermovement) GameObject.FindGameObjectWithTag ("Player").
+			GetComponent(typeof(Playermovement));
 
         StartGame();
 	}
 
     void StartGame()
     {
+
         Time.timeScale = 1.0f;
         gameState = GameState.playing;
 
@@ -42,20 +46,24 @@ public class GameControl : MonoBehaviour {
 	void Update () {
 		if (playerTrans.position.x > cameraTrans.position.x + levelWidth/2){
 			Vector3 temp = new Vector3(levelWidth,0,0);
-			cameraTrans.position += temp; 
+			cameraTrans.position += temp;
+			playerscript.setSalt(false);
 		}
 		else if (playerTrans.position.x < cameraTrans.position.x - levelWidth/2) {
 			Vector3 temp = new Vector3(-levelWidth,0,0);
-			cameraTrans.position += temp; 
+			cameraTrans.position += temp;
+			playerscript.setSalt(false);
 		}
 
 		if (playerTrans.position.y > cameraTrans.position.y - overHeight + levelHeight/2){
 			Vector3 temp = new Vector3(0,levelHeight,0);
-			cameraTrans.position += temp; 
+			cameraTrans.position += temp;
+			playerscript.setSalt(false);
 		}
 		else if (playerTrans.position.y < cameraTrans.position.y - overHeight - levelHeight/2) {
 			Vector3 temp = new Vector3(0,-levelHeight,0);
-			cameraTrans.position += temp; 
+			cameraTrans.position += temp;
+			playerscript.setSalt(false);
 		}
 	}
 

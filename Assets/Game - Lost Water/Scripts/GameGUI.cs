@@ -48,8 +48,6 @@ public class GameGUI : MonoBehaviour {
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
-
-
         }
     }
 

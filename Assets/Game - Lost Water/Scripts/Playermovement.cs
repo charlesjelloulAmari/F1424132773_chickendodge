@@ -20,6 +20,8 @@ public class Playermovement : MonoBehaviour
 	public GameObject poison;
 	public GameObject flubber;
 	public GameObject ice;
+	
+	public GameObject shining;
 
 	public GameObject grilleOnCollision;
 
@@ -27,19 +29,21 @@ public class Playermovement : MonoBehaviour
 	public PhysicMaterial bouncy;
 	public PhysicMaterial ice_mat;
 
-	public int compteur = 0;
-	
+	public bool salt;
 
 	float distToGround;
 
 	void Start(){
 
+		salt = false;
 		distToGround = collider.bounds.extents.y;
+
 		water = GameObject.Find("Water");
 		vapor = GameObject.Find ("Vapor");
 		poison = GameObject.Find ("Poison");
 		flubber = GameObject.Find ("Flubber");
 		ice = GameObject.Find ("Ice");
+		shining = GameObject.Find ("Shining");
 		
 		bouncy = (PhysicMaterial)Resources.Load ("Bouncy_2");
 		ice_mat = (PhysicMaterial)Resources.Load ("Ice_2");
@@ -53,6 +57,7 @@ public class Playermovement : MonoBehaviour
 		poison.SetActive(false);
 		flubber.SetActive(false);
 		ice.SetActive (false);
+		shining.SetActive (false);
 
 	}
 
@@ -166,6 +171,10 @@ public class Playermovement : MonoBehaviour
 			passTo(PlayerForm.Flubber);
 			rigidbody.useGravity = true;
 		}
+		if (col.gameObject.name.Contains("Tas_Sel")) {
+			salt = true;
+			shining.SetActive (true);
+		}
 
 		if (form == PlayerForm.Vapor && col.gameObject.name.Contains("EdgeTrigger") ){
 			passTo (PlayerForm.Water);
@@ -176,9 +185,17 @@ public class Playermovement : MonoBehaviour
 			grilleOnCollision = col.gameObject;
 		}
 
-		if(col.gameObject.name.Contains("Contact")){
-			col.gameObject.GetComponentInParent<Animator>().Play("condensation_generator");
-			col.gameObject.transform.parent.Find("Lightning").gameObject.SetActive(false);
+		if(col.gameObject.name.Contains("Contact") && salt){
+			string parentName = col.gameObject.transform.parent.name;
+			if(parentName.Equals("Lightning_system")){
+				col.gameObject.GetComponentInParent<Animator>().Play("condensation_generator");
+				//col.gameObject.transform.parent.Find("Lightning").gameObject.SetActive(false);
+			}
+			else if(parentName.Equals("Door_system")){
+				Debug.Log("Debut");
+				col.gameObject.GetComponentInParent<Animator>().Play("acdctodoor");
+				Debug.Log("Fin");
+			}
 		}
 	}
 
@@ -189,7 +206,6 @@ public class Playermovement : MonoBehaviour
 		poison.SetActive(false);
 		ice.SetActive(false);
 
-		
 		collider.material = null;
 		
 		switch (to) {
@@ -226,6 +242,11 @@ public class Playermovement : MonoBehaviour
 
 	bool IsGroundedUp (){
 		return Physics.Raycast(transform.position, Vector3.up, distToGround + 1.1f);
+	}
+
+	public void setSalt(bool sel){
+		salt = sel;
+		shining.SetActive (sel);
 	}
 	
 }
