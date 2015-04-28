@@ -1,11 +1,15 @@
 using UnityEngine;
 using System.Collections;
 
-public enum PlayerForm{ Water, Vapor, Poison, Flubber, Ice};
+public enum PlayerForm{ Water, Vapor, Poison, Flubber, Ice, Cloud};
 
 public class Playermovement : MonoBehaviour
-
 {
+	
+	string GOUTTE_SOUND = "Assets/Resources/Sound/goutte.mp3";
+	string FLUBBER_SOUND = "Assets/Resources/Sound/jumpFlubber.mp3";
+	string NO_SOUND = "Assets/Resources/Sound/";
+	
 
 	public int highJump = 600;
 	public int normalJump = 250;
@@ -20,6 +24,7 @@ public class Playermovement : MonoBehaviour
 	public GameObject poison;
 	public GameObject flubber;
 	public GameObject ice;
+	public GameObject cloud;
 	
 	public GameObject shining;
 
@@ -30,6 +35,8 @@ public class Playermovement : MonoBehaviour
 	public PhysicMaterial ice_mat;
 
 	public bool salt;
+
+	AudioClip jumpSound; 
 
 	float distToGround;
 
@@ -43,20 +50,22 @@ public class Playermovement : MonoBehaviour
 		poison = GameObject.Find ("Poison");
 		flubber = GameObject.Find ("Flubber");
 		ice = GameObject.Find ("Ice");
+		cloud = GameObject.Find ("Cloud");
+
 		shining = GameObject.Find ("Shining");
 		
 		bouncy = (PhysicMaterial)Resources.Load ("Bouncy_2");
 		ice_mat = (PhysicMaterial)Resources.Load ("Ice_2");
 
-		if (ice_mat == null)
-			Debug.Log ("ice mat null");
-
+		audio.clip = (AudioClip)Resources.LoadAssetAtPath(GOUTTE_SOUND, typeof(AudioClip));
+		
 		PlayerForm form = PlayerForm.Water;
 
 		vapor.SetActive(false);
 		poison.SetActive(false);
 		flubber.SetActive(false);
 		ice.SetActive (false);
+		cloud.SetActive (false);
 		shining.SetActive (false);
 
 	}
@@ -64,12 +73,16 @@ public class Playermovement : MonoBehaviour
     void Update() {
 		rigidbody.velocity = new Vector3 (0, rigidbody.velocity.y, 0); //Set X and Z velocity to 0
 
+		/*Gravité inversée en mode vapor*/
 		if (form == PlayerForm.Vapor ) {
 			rigidbody.velocity = new Vector3(0,rigidbody.velocity.y  + GameControl.gravity * Time.deltaTime,0);
 		}
 
         transform.Translate(Input.GetAxis("Horizontal") * Time.deltaTime * movementSpeed, 0, 0);
 
+		if(form == PlayerForm.Cloud)
+			transform.Translate(0,Input.GetAxis("Vertical") * Time.deltaTime * movementSpeed , 0);
+		
 		gererInput ();
 
 	}
@@ -102,7 +115,6 @@ public class Playermovement : MonoBehaviour
 	
 	void Jump()
     {	     
-
 		switch (form) {
 		case PlayerForm.Water:
 		case PlayerForm.Poison:
@@ -110,6 +122,7 @@ public class Playermovement : MonoBehaviour
 			if (isGrounded) {
 				isGrounded = false;
 				rigidbody.velocity = new Vector3 (0, 0, 0);
+				audio.Play ();
 				rigidbody.AddForce (new Vector3 (0, normalJump, 0), ForceMode.Force);
 			}  
 			break;
@@ -122,6 +135,7 @@ public class Playermovement : MonoBehaviour
 		case PlayerForm.Flubber:
 			if (isGrounded) {
 				isGrounded = false;
+				audio.Play ();
 				rigidbody.velocity = new Vector3 (0, 0, 0);
 				rigidbody.AddForce (new Vector3 (0, highJump, 0), ForceMode.Force);
 			}
@@ -130,6 +144,7 @@ public class Playermovement : MonoBehaviour
 			if (isGrounded) {
 				isGrounded = false;
 				rigidbody.velocity = new Vector3 (0, 0, 0);
+				audio.Play ();
 				rigidbody.AddForce (new Vector3 (0, lowJump, 0), ForceMode.Force);
 			}
 			break;
@@ -155,8 +170,11 @@ public class Playermovement : MonoBehaviour
 
 	void OnCollisionEnter(Collision col){
 		if (col.gameObject.name.Contains("Radiateur")) {
-			passTo(PlayerForm.Vapor);
 			rigidbody.useGravity = false;
+			if(!salt)
+				passTo(PlayerForm.Vapor);
+			else
+				passTo (PlayerForm.Cloud);
 		}
 		if (col.gameObject.name.Contains("JetGel")) {
 			passTo(PlayerForm.Ice);
@@ -176,7 +194,7 @@ public class Playermovement : MonoBehaviour
 			shining.SetActive (true);
 		}
 
-		if (form == PlayerForm.Vapor && col.gameObject.name.Contains("EdgeTrigger") ){
+		if ((form == PlayerForm.Vapor ||form == PlayerForm.Cloud) && col.gameObject.name.Contains("EdgeTrigger") ){
 			passTo (PlayerForm.Water);
 			rigidbody.useGravity = false;
 		}
@@ -189,13 +207,15 @@ public class Playermovement : MonoBehaviour
 			string parentName = col.gameObject.transform.parent.name;
 			if(parentName.Equals("Lightning_system")){
 				col.gameObject.GetComponentInParent<Animator>().Play("condensation_generator");
-				//col.gameObject.transform.parent.Find("Lightning").gameObject.SetActive(false);
 			}
 			else if(parentName.Equals("Door_system")){
-				Debug.Log("Debut");
 				col.gameObject.GetComponentInParent<Animator>().Play("acdctodoor");
-				Debug.Log("Fin");
 			}
+		}
+
+		if(col.gameObject.name.Contains("GameOver")){
+			Vector3 temp = new Vector3(-12,10,0);
+			transform.position = temp;
 		}
 	}
 
@@ -205,37 +225,48 @@ public class Playermovement : MonoBehaviour
 		flubber.SetActive(false);
 		poison.SetActive(false);
 		ice.SetActive(false);
+		cloud.SetActive (false);
 
 		collider.material = null;
 		
 		switch (to) {
 		case PlayerForm.Water:
 			form = PlayerForm.Water;
+			audio.clip = (AudioClip)Resources.LoadAssetAtPath(GOUTTE_SOUND, typeof(AudioClip));
 			water.SetActive(true);
 			break;
 		case PlayerForm.Poison:
 			form = PlayerForm.Poison;
+			audio.clip = (AudioClip)Resources.LoadAssetAtPath(GOUTTE_SOUND, typeof(AudioClip));
 			poison.SetActive(true);
 			break;
 		case PlayerForm.Flubber:
 			form = PlayerForm.Flubber;
+			audio.clip = (AudioClip)Resources.LoadAssetAtPath(FLUBBER_SOUND, typeof(AudioClip));
 			collider.material = bouncy;
 			flubber.SetActive(true);
 			break;
 		case PlayerForm.Vapor:
 			form = PlayerForm.Vapor;
+			audio.clip = (AudioClip)Resources.LoadAssetAtPath(GOUTTE_SOUND, typeof(AudioClip));
 			vapor.SetActive(true);
 			break;
 		case PlayerForm.Ice:
 			form = PlayerForm.Ice;
+			audio.clip = (AudioClip)Resources.LoadAssetAtPath(NO_SOUND, typeof(AudioClip));
 			collider.material = ice_mat;
 			ice.SetActive(true);
+			break;
+		case PlayerForm.Cloud:
+			form = PlayerForm.Cloud;
+			audio.clip = (AudioClip)Resources.LoadAssetAtPath(NO_SOUND, typeof(AudioClip));
+			cloud.SetActive(true);
 			break;
 		}
 	}
 
 	void OnCollisionExit(Collision col){
-		if (form != PlayerForm.Vapor && !IsGroundedUp()) {
+		if (form != PlayerForm.Vapor && !IsGroundedUp() && form!= PlayerForm.Cloud) {
 			rigidbody.useGravity = true;
 		}
 	}
